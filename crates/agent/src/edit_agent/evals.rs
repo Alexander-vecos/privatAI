@@ -293,7 +293,7 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
     //  gemini-2.5-pro-preview-latest  |  0.99 (2025-06-16)
     //  gemini-2.5-flash-preview-04-17 |
 
-    let input_file_path = "root/lib.rs";
+    let input_file_path = "root/loader.rs";
     let input_file_content =
         include_str!("evals/fixtures/use_wasi_sdk_in_compile_parser_to_wasm/before.rs");
     let edit_description = "Update compile_parser_to_wasm to use wasi-sdk instead of emscripten";
@@ -305,8 +305,8 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                     User,
                     [text(formatdoc! {"
                             Read the `{input_file_path}` file and change `compile_parser_to_wasm` to use `wasi-sdk` instead of emscripten.
-                            Use `ureq` to download the SDK for the current platform and architecture.
-                            Extract the archive into a sibling of `lib` inside the `tree-sitter` directory in the cache_dir.
+                            Use the `curl` command to download the SDK for the current platform and architecture.
+                            Use the `tar` command to extract the archive into a sibling of `wasi-sdk` inside the `tree-sitter` directory in the cache_dir.
                             Compile the parser to wasm using the `bin/clang` executable (or `bin/clang.exe` on windows)
                             that's inside of the archive.
                             Don't re-download the SDK if that executable already exists.
@@ -314,13 +314,12 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                             Use these clang flags: -fPIC -shared -Os -Wl,--export=tree_sitter_{{language_name}}
 
                             Here are the available wasi-sdk assets:
-                            - wasi-sdk-25.0-x86_64-macos.tar.gz
-                            - wasi-sdk-25.0-arm64-macos.tar.gz
-                            - wasi-sdk-25.0-x86_64-linux.tar.gz
-                            - wasi-sdk-25.0-arm64-linux.tar.gz
-                            - wasi-sdk-25.0-x86_64-linux.tar.gz
-                            - wasi-sdk-25.0-arm64-linux.tar.gz
-                            - wasi-sdk-25.0-x86_64-windows.tar.gz
+                            - wasi-sdk-29.0-x86_64-macos.tar.gz
+                            - wasi-sdk-29.0-arm64-macos.tar.gz
+                            - wasi-sdk-29.0-x86_64-linux.tar.gz
+                            - wasi-sdk-29.0-arm64-linux.tar.gz
+                            - wasi-sdk-29.0-x86_64-windows.tar.gz
+                            - wasi-sdk-29.0-arm64-windows.tar.gz
                         "})],
                 ),
                 message(
@@ -330,8 +329,8 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                         ReadFileTool::NAME,
                         ReadFileToolInput {
                             path: input_file_path.into(),
-                            start_line: Some(971),
-                            end_line: Some(1050),
+                            start_line: Some(1348),
+                            end_line: Some(1427),
                         },
                     )],
                 ),
@@ -340,7 +339,7 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                     [tool_result(
                         "tool_1",
                         ReadFileTool::NAME,
-                        lines(input_file_content, 971..1050),
+                        lines(input_file_content, 1348..1427),
                     )],
                 ),
                 message(
@@ -350,8 +349,8 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                         ReadFileTool::NAME,
                         ReadFileToolInput {
                             path: input_file_path.into(),
-                            start_line: Some(1050),
-                            end_line: Some(1100),
+                            start_line: Some(1427),
+                            end_line: Some(1477),
                         },
                     )],
                 ),
@@ -360,7 +359,7 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                     [tool_result(
                         "tool_2",
                         ReadFileTool::NAME,
-                        lines(input_file_content, 1050..1100),
+                        lines(input_file_content, 1427..1477),
                     )],
                 ),
                 message(
@@ -370,8 +369,8 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                         ReadFileTool::NAME,
                         ReadFileToolInput {
                             path: input_file_path.into(),
-                            start_line: Some(1100),
-                            end_line: Some(1150),
+                            start_line: Some(1477),
+                            end_line: Some(1527),
                         },
                     )],
                 ),
@@ -380,7 +379,7 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
                     [tool_result(
                         "tool_3",
                         ReadFileTool::NAME,
-                        lines(input_file_content, 1100..1150),
+                        lines(input_file_content, 1477..1527),
                     )],
                 ),
                 message(
@@ -399,7 +398,7 @@ fn eval_use_wasi_sdk_in_compile_parser_to_wasm() {
             Some(input_file_content.into()),
             EvalAssertion::judge_diff(indoc! {"
                     - The compile_parser_to_wasm method has been changed to use wasi-sdk
-                    - ureq is used to download the SDK for current platform and architecture
+                    - The curl command is used to download the SDK for current platform and architecture
                 "}),
         ))
     });
