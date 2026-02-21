@@ -521,7 +521,7 @@ async fn test_inverted_diff_hunks_in_range(cx: &mut TestAppContext) {
     let buffer = cx.new(|cx| Buffer::local(text, cx));
     let diff = cx
         .new(|cx| BufferDiff::new_with_base_text(base_text, &buffer.read(cx).text_snapshot(), cx));
-    let base_text_buffer = diff.read_with(cx, |diff, _| diff.base_text_buffer().clone());
+    let base_text_buffer = diff.read_with(cx, |diff, _| diff.base_text_buffer());
     let multibuffer = cx.new(|cx| MultiBuffer::singleton(base_text_buffer.clone(), cx));
     let (mut snapshot, mut subscription) = multibuffer.update(cx, |multibuffer, cx| {
         (multibuffer.snapshot(cx), multibuffer.subscribe())
@@ -3073,7 +3073,7 @@ async fn test_random_multibuffer(cx: &mut TestAppContext, mut rng: StdRng) {
                         });
 
                         let base_text_buffer =
-                            diff.read_with(cx, |diff, _| diff.base_text_buffer().clone());
+                            diff.read_with(cx, |diff, _| diff.base_text_buffer());
 
                         // Track for recalculation when main buffer is edited
                         inverted_diff_main_buffers.insert(main_buffer_id, diff.clone());
@@ -3107,7 +3107,7 @@ async fn test_random_multibuffer(cx: &mut TestAppContext, mut rng: StdRng) {
 
                     if let Some(diff) = inverted_diff_main_buffers.get(&buffer_id) {
                         let base_text_buffer =
-                            diff.read_with(cx, |diff, _| diff.base_text_buffer().clone());
+                            diff.read_with(cx, |diff, _| diff.base_text_buffer());
                         (base_text_buffer, diff.clone(), Some(buffer_handle))
                     } else {
                         // Get existing diff or create new one for regular buffer
@@ -3940,7 +3940,7 @@ async fn test_singleton_with_inverted_diff(cx: &mut TestAppContext) {
         .new(|cx| BufferDiff::new_with_base_text(base_text, &buffer.read(cx).text_snapshot(), cx));
     cx.run_until_parked();
 
-    let base_text_buffer = diff.read_with(cx, |diff, _| diff.base_text_buffer().clone());
+    let base_text_buffer = diff.read_with(cx, |diff, _| diff.base_text_buffer());
 
     let multibuffer = cx.new(|cx| {
         let mut multibuffer = MultiBuffer::singleton(base_text_buffer.clone(), cx);
@@ -4091,7 +4091,7 @@ async fn test_inverted_diff_base_text_change(cx: &mut TestAppContext) {
         .new(|cx| BufferDiff::new_with_base_text(base_text, &buffer.read(cx).text_snapshot(), cx));
     cx.run_until_parked();
 
-    let base_text_buffer = diff.read_with(cx, |diff, _| diff.base_text_buffer().clone());
+    let base_text_buffer = diff.read_with(cx, |diff, _| diff.base_text_buffer());
 
     let multibuffer = cx.new(|cx| {
         let mut multibuffer = MultiBuffer::singleton(base_text_buffer.clone(), cx);
@@ -4182,8 +4182,7 @@ async fn test_inverted_diff_secondary_version_mismatch(cx: &mut TestAppContext) 
         })
         .await;
 
-    let base_text_buffer =
-        uncommitted_diff.read_with(cx, |diff, _| diff.base_text_buffer().clone());
+    let base_text_buffer = uncommitted_diff.read_with(cx, |diff, _| diff.base_text_buffer());
 
     let multibuffer = cx.new(|cx| {
         let mut multibuffer = MultiBuffer::singleton(base_text_buffer.clone(), cx);
