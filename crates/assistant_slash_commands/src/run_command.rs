@@ -55,9 +55,10 @@ impl SlashCommand for RunSlashCommand {
         _window: &mut Window,
         cx: &mut App,
     ) -> Task<SlashCommandResult> {
-        let Some(command) = arguments.first().cloned() else {
+        if arguments.is_empty() {
             return Task::ready(Err(anyhow!("missing command")));
-        };
+        }
+        let command = arguments.join(" ");
 
         let working_dir = workspace
             .upgrade()
