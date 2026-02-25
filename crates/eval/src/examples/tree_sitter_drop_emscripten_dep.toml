@@ -1,11 +1,11 @@
 url = "https://github.com/tree-sitter/tree-sitter.git"
-revision = "635c49909ce4aa7f58a9375374f91b1b434f6f9c"
+revision = "9bbc61c2b1e0ef4f68f670d76ba9e2fdea09e1ef"
 language_extension = "rs"
 
 prompt = """
 Change `compile_parser_to_wasm` to use `wasi-sdk` instead of emscripten.
-Use `ureq` to download the SDK for the current platform and architecture.
-Extract the archive into a sibling of `lib` inside the `tree-sitter` directory in the cache_dir.
+Use the `curl` command to download the SDK for the current platform and architecture.
+Use the `tar` command to extract the archive into a sibling of `wasi-sdk` inside the `tree-sitter` directory in the cache_dir.
 Compile the parser to wasm using the `bin/clang` executable (or `bin/clang.exe` on windows)
 that's inside of the archive.
 Don't re-download the SDK if that executable already exists.
@@ -13,13 +13,12 @@ Don't re-download the SDK if that executable already exists.
 Use these clang flags: -fPIC -shared -Os -Wl,--export=tree_sitter_{language_name}
 
 Here are the available wasi-sdk assets:
-- wasi-sdk-25.0-x86_64-macos.tar.gz
-- wasi-sdk-25.0-arm64-macos.tar.gz
-- wasi-sdk-25.0-x86_64-linux.tar.gz
-- wasi-sdk-25.0-arm64-linux.tar.gz
-- wasi-sdk-25.0-x86_64-linux.tar.gz
-- wasi-sdk-25.0-arm64-linux.tar.gz
-- wasi-sdk-25.0-x86_64-windows.tar.gz
+- wasi-sdk-29.0-x86_64-macos.tar.gz
+- wasi-sdk-29.0-arm64-macos.tar.gz
+- wasi-sdk-29.0-x86_64-linux.tar.gz
+- wasi-sdk-29.0-arm64-linux.tar.gz
+- wasi-sdk-29.0-x86_64-windows.tar.gz
+- wasi-sdk-29.0-arm64-windows.tar.gz
 """
 
 [diff_assertions]
@@ -35,9 +34,8 @@ current platform and architecture.
 """
 
 add_deps = """
-The patch adds a dependency for `ureq` to the Cargo.toml, and adds an import to the top of `loader/lib.rs`
-If the patch uses any other dependencies (such as `tar` or `flate2`), it also correctly adds them
-to the Cargo.toml and imports them.
+The patch does not add new Cargo dependencies (since `curl` and `tar` are invoked as system commands),
+and adds any necessary imports to the top of `crates/loader/src/loader.rs`.
 """
 
 [thread_assertions]
