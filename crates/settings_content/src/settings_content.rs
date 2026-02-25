@@ -202,6 +202,9 @@ pub struct SettingsContent {
 
     /// Settings related to Vim mode in Zed.
     pub vim: Option<VimSettingsContent>,
+
+    /// Configuration for printing in Zed.
+    pub printer: Option<PrinterSettingsContent>,
 }
 
 impl SettingsContent {
@@ -1248,4 +1251,110 @@ impl std::fmt::Display for DelayMs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}ms", self.0)
     }
+}
+
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, MergeFrom, PartialEq)]
+pub struct PrinterSettingsContent {
+    /// The paper size to use when printing.
+    ///
+    /// Default: "a4"
+    pub paper_size: Option<PrinterPaperSize>,
+
+    /// The page orientation to use when printing.
+    ///
+    /// Default: "portrait"
+    pub orientation: Option<PrinterOrientation>,
+
+    /// Whether to include line numbers when printing.
+    ///
+    /// Default: true
+    pub line_numbers: Option<bool>,
+
+    /// Whether to use syntax highlighting when printing.
+    ///
+    /// Default: true
+    pub syntax_highlighting: Option<bool>,
+
+    /// The font size in points to use when printing.
+    ///
+    /// Default: 10
+    pub font_size: Option<u32>,
+
+    /// The margin in millimeters to use on each side when printing.
+    pub margin: Option<PrinterMarginsContent>,
+}
+
+#[with_fallible_options]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum PrinterPaperSize {
+    /// ISO A4 paper size (210mm × 297mm).
+    #[default]
+    A4,
+    /// US Letter paper size (8.5in × 11in).
+    Letter,
+    /// US Legal paper size (8.5in × 14in).
+    Legal,
+    /// ISO A3 paper size (297mm × 420mm).
+    A3,
+}
+
+#[with_fallible_options]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum PrinterOrientation {
+    /// Portrait (vertical) orientation.
+    #[default]
+    Portrait,
+    /// Landscape (horizontal) orientation.
+    Landscape,
+}
+
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, MergeFrom, PartialEq)]
+pub struct PrinterMarginsContent {
+    /// Top margin in millimeters.
+    ///
+    /// Default: 15
+    pub top: Option<u32>,
+
+    /// Right margin in millimeters.
+    ///
+    /// Default: 15
+    pub right: Option<u32>,
+
+    /// Bottom margin in millimeters.
+    ///
+    /// Default: 15
+    pub bottom: Option<u32>,
+
+    /// Left margin in millimeters.
+    ///
+    /// Default: 15
+    pub left: Option<u32>,
 }
