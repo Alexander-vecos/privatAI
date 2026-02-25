@@ -1,0 +1,78 @@
+/**
+ * Firestore Security Rules for PrintStudio IdeaPack
+ * 
+ * IMPORTANT: These are example rules. Adjust based on your security requirements.
+ * Test thoroughly before deploying to production.
+ */
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ============ KEYS COLLECTION ============
+    // Access keys - managed only by server-side functions (deny client access)
+    match /keys/{document=**} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // ============ USERS COLLECTION ============
+    // User profiles - can read own, admins can modify
+    match /users/{uid} {
+      allow read: if request.auth.uid == uid;
+      allow create: if request.auth != null;
+      allow update: if request.auth.uid == uid || request.auth.token.role == 'admin';
+      allow delete: if request.auth.token.role == 'admin';
+    }
+
+    // ============ FILES COLLECTION ============
+    // Files storage - authenticated users can read all, write their own
+    match /files/{fileId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && 
+                       request.resource.data.uploadedBy == request.auth.uid;
+      allow update: if request.auth != null &&
+                       (request.auth.uid == resource.data.uploadedBy ||
+                        request.auth.token.role == 'admin');
+      allow delete: if request.auth != null &&
+                       (request.auth.uid == resource.data.uploadedBy ||
+                        request.auth.token.role == 'admin');
+    }
+
+    // File chunks subcollection
+    match /files/{fileId}/chunks/{chunkId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ============ ORDERS COLLECTION ============
+    // Orders created by authenticated users; updates/deletes allowed to owner or admins
+    match /orders/{orderId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.createdBy == request.auth.uid;
+      allow update: if request.auth != null && (resource.data.createdBy == request.auth.uid || request.auth.token.role == 'admin');
+      allow delete: if request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // ============ ADMIN ONLY COLLECTIONS ============
+    // Statistics, logs, audit
+    match /stats/{document=**} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /key_audit/{document=**} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow write: if false;
+    }
+
+    // ============ REFERENCE DATA ============
+    match /reference/{collection}/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ============ DENY EVERYTHING ELSE ============
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

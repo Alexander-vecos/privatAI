@@ -1,0 +1,50 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nexus-polygraf/**'
+      - 'functions/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Build frontend
+      - name: Install frontend deps
+        working-directory: nexus-polygraf
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: nexus-polygraf
+        run: npm run build
+
+      # Build Cloud Functions
+      - name: Install functions deps
+        working-directory: functions
+        run: npm ci
+
+      - name: Build functions
+        working-directory: functions
+        run: npm run build
+
+      # Deploy
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+
+      - name: Deploy Functions
+        run: npx firebase-tools deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'

@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "site": "nexuspolygraf",
+    "public": "nexus-polygraf/dist",
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs22"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

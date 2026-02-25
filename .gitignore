@@ -42,6 +42,14 @@ crates/docs_preprocessor/actions.json
 .env
 .env.secret.toml
 
+# Firebase/Node.js project build artifacts
+nexus-polygraf/node_modules/
+nexus-polygraf/dist/
+functions/node_modules/
+functions/lib/
+.firebase/
+firebase-debug.log
+
 # `nix build` output
 /result
 
